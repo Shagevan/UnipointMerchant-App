@@ -24,23 +24,21 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="UNI POINT"
-                android:textSize="25dp"
-                android:textColor="@color/white_color"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginBottom="8dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="32dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
-                app:layout_constraintLeft_toLeftOf="parent"
                 android:layout_marginRight="8dp"
-                app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:src="@drawable/unipoint_logo_toolbar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/qrdecoderview"
@@ -67,7 +65,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:tabBackground="@color/colorPrimary"
+        app:tabBackground="@color/black_color"
         app:tabGravity="fill"
         app:tabMode="fixed"
         app:tabMaxWidth="0dp"/>

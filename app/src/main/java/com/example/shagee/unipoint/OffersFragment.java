@@ -53,6 +53,9 @@ public class OffersFragment extends Fragment {
     private PostgrestInterface postgrestService;
     private UnipointMerchantInterface unipointMerchantService;
     private Offer loadedOffer;
+    private String merchantUserRefId;
+    private  String outletRefId;
+    private String merchantRefId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +65,11 @@ public class OffersFragment extends Fragment {
         // INITIALIZE CLIENT
         postgrestService = PostgrestClient.getClient().create(PostgrestInterface.class);
         unipointMerchantService = UnipointMerchantClient.getClient().create(UnipointMerchantInterface.class);
+
+        SharedPreferences pref = getContext().getSharedPreferences("MerchantUserInfo", 0);
+        merchantUserRefId = pref.getString("merchantUserRefId", "");
+        outletRefId = pref.getString("outletRefId", "");
+        merchantRefId = pref.getString("merchantRefId", "");
 
         // INITIALIZE VIEWS
         offerNameET = (EditText) offerFragmentView.findViewById(R.id.OffersFragmentOfferNameET);
@@ -109,10 +117,8 @@ public class OffersFragment extends Fragment {
                     String outletRefId = pref.getString("outletRefId", "");
                     String unipointCustomerRefId = pref1.getString("unipointCustomerRefId", "");
 
-                    releaseOffer(loadedOffer.getOfferId(),Integer.parseInt(merchantUserRefId),
-                            Integer.parseInt(unipointCustomerRefId),
-                            loadedOffer.getPointsAllocated());
-
+                    releaseOffer(String.valueOf(loadedOffer.getOfferId()),merchantUserRefId,
+                            unipointCustomerRefId,String.valueOf(loadedOffer.getPointsAllocated()));
                 }
                 else {
                     Toast.makeText(getContext(), "Incorrect Redemption code", Toast.LENGTH_LONG).show();
@@ -120,21 +126,24 @@ public class OffersFragment extends Fragment {
             }
         });
 
-        loadUppAndRunningOffers();
-        loadOfferClaimingHistories();
+        loadUppAndRunningOffers(merchantRefId);
+        loadOfferClaimingHistories(merchantUserRefId);
 
         return offerFragmentView;
     }
 
-    public void loadOfferClaimingHistories(){
-        Call<OfferClaimHistoryResponse> call = unipointMerchantService.getOfferClaimingHistory(1);
+    public void loadOfferClaimingHistories(String merchantUserRefId){
+        Call<OfferClaimHistoryResponse> call = unipointMerchantService.getOfferClaimingHistory(merchantUserRefId);
         call.enqueue(new Callback<OfferClaimHistoryResponse>() {
             @Override
             public void onResponse(Call<OfferClaimHistoryResponse> call, Response<OfferClaimHistoryResponse> response) {
                 Log.d(TAG, "success");
-                offerClaimingHistories.clear();
-                offerClaimingHistories.addAll(response.body().getOfferClaimHistory());
-                offerClaimingHistoryAdapter.notifyDataSetChanged();
+                if(response.body().getOfferClaimHistory() != null){
+                    offerClaimingHistories.clear();
+                    offerClaimingHistories.addAll(response.body().getOfferClaimHistory());
+                    offerClaimingHistoryAdapter.notifyDataSetChanged();
+                }
+
             }
 
             @Override
@@ -144,15 +153,17 @@ public class OffersFragment extends Fragment {
         });
     }
 
-    public void releaseOffer(int offerRefId, int merchantUserRefId, int unipointCustomerRefId, int pointsAdded){
+    public void releaseOffer(String offerRefId, String merchantUserRefId, String unipointCustomerRefId, String pointsAdded){
         Call<OfferClaimHistoryResponse> call = unipointMerchantService.releaseOffer(offerRefId, merchantUserRefId,unipointCustomerRefId,pointsAdded);
         call.enqueue(new Callback<OfferClaimHistoryResponse>() {
             @Override
             public void onResponse(Call<OfferClaimHistoryResponse> call, Response<OfferClaimHistoryResponse> response) {
                 Log.d(TAG, "success");
-                offerClaimingHistories.clear();
-                offerClaimingHistories.addAll(response.body().getOfferClaimHistory());
-                offerClaimingHistoryAdapter.notifyDataSetChanged();
+                if(response.body().getOfferClaimHistory() != null){
+                    offerClaimingHistories.clear();
+                    offerClaimingHistories.addAll(response.body().getOfferClaimHistory());
+                    offerClaimingHistoryAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -162,14 +173,15 @@ public class OffersFragment extends Fragment {
         });
     }
 
-    public void loadUppAndRunningOffers(){
-        Call<List<Offer>> call = postgrestService.getUpAndRunningOffers("eq.7");
+    public void loadUppAndRunningOffers(String merchantRefId){
+        Call<List<Offer>> call = postgrestService.getUpAndRunningOffers("eq."+merchantRefId);
         call.enqueue(new Callback<List<Offer>>() {
             @Override
             public void onResponse(Call<List<Offer>> call, Response<List<Offer>> response) {
                 Log.d(TAG, "success");
                 List<Offer> tempRunningOffers = response.body();
-                runningOffers.clear();
+                if(tempRunningOffers != null){
+                    runningOffers.clear();
               /*Calendar c = Calendar.getInstance();
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String formattedDate = df.format(c.getTime());
@@ -185,9 +197,11 @@ public class OffersFragment extends Fragment {
                     }*/
                     runningOffers.addAll(response.body());
                     runningOffersAdapter.notifyDataSetChanged();
-                //} catch (ParseException e) {
-                //    e.printStackTrace();
-                //}
+                    //} catch (ParseException e) {
+                    //    e.printStackTrace();
+                    //}
+                }
+
             }
 
             @Override
@@ -201,7 +215,7 @@ public class OffersFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadUppAndRunningOffers();
-        loadOfferClaimingHistories();
+        loadUppAndRunningOffers(merchantRefId);
+        loadOfferClaimingHistories(merchantUserRefId);
     }
 }

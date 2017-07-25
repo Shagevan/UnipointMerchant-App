@@ -1,5 +1,6 @@
 package com.example.shagee.unipoint;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText passwordET;
     private Button loginBtn;
     private UnipointMerchantInterface unipointMerchantService;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void doLogin(String userName, String password){
+        progressDialog = new ProgressDialog(LoginActivity.this);
+        progressDialog.setTitle("Signing in ...");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(true);
+        progressDialog.show();
         Call<MerchantUserLoginResponse> call = unipointMerchantService.login(userName,password);
         call.enqueue(new Callback<MerchantUserLoginResponse>() {
             @Override
@@ -59,12 +66,16 @@ public class LoginActivity extends AppCompatActivity {
                     edt.putString("outletRefId", response.body().getOutletRefId());
                     edt.putString("merchantUserName", response.body().getMerchantUserName());
                     edt.putString("merchantUserRefId", response.body().getMerchantUserRefId());
+                    edt.putString("merchantName", response.body().getMerchantName());
+                    edt.putString("merchantRefId", response.body().getMerchantRefId());
                     edt.commit();
+                    progressDialog.dismiss();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                 }
                 else{
+                    progressDialog.dismiss();
                     userNmeET.setText("");
                     passwordET.setText("");
                     Toast.makeText(LoginActivity.this, "Incorrect Credentials", Toast.LENGTH_LONG).show();
@@ -73,7 +84,8 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MerchantUserLoginResponse> call, Throwable t) {
-
+                progressDialog.dismiss();
+                Toast.makeText(LoginActivity.this, " please try again", Toast.LENGTH_LONG).show();
             }
         });
     }

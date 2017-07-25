@@ -16,5 +16,5 @@ public interface PostgrestInterface {
                                            @Query("outlet_ref_id") String outletRefId);
 
     @GET("offer")
-    Call<List<Offer>> getUpAndRunningOffers(@Query("merchant_ref_id") String mercantRefId);
+    Call<List<Offer>> getUpAndRunningOffers(@Query("merchant_ref_id") String merchantRefId);
 }

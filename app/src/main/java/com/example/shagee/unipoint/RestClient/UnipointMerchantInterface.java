@@ -21,32 +21,31 @@ public interface UnipointMerchantInterface {
 
     @POST("points/addFromInvoice")
     Call<TransctionHistoryResponse> addFromInvoice(@Query("customerMobileNumber") String customerMobileNumber,
-                                                   @Query("invoiceNumber") int invoiceNumber,
-                                                   @Query("merchantUserRefId") int merchantUserRefId,
-                                                   @Query("outletRefId") int outletRefId);
+                                                   @Query("invoiceNumber") String invoiceNumber,
+                                                   @Query("merchantUserRefId") String merchantUserRefId);
 
     @POST("points/addFromAmount")
     Call<TransctionHistoryResponse> addPointsFromAmount(@Query("customerMobileNumber") String customerMobileNumber,
-                                                   @Query("billAmount") int billAmount,
-                                                   @Query("merchantUserRefId") int merchantUserRefId,
-                                                   @Query("outletRefId") int outletRefId);
+                                                   @Query("billAmount") String billAmount,
+                                                   @Query("merchantUserRefId") String merchantUserRefId,
+                                                   @Query("transactionType") String transactionType);
 
     @POST("points/redeem")
     Call<TransctionHistoryResponse> redeemPoints(@Query("customerMobileNumber") String customerMobileNumber,
-                                                 @Query("invoiceNumber") int invoiceNumber,
-                                                 @Query("points") double points,
-                                                 @Query("merchantUserRefId") int merchantUserRefId,
-                                                 @Query("outletRefId") int outletRefId);
+                                                 @Query("billValue") String billValue,
+                                                 @Query("points") String points,
+                                                 @Query("merchantUserRefId") String merchantUserRefId,
+                                                 @Query("transactionType") String transactionType);
 
     @GET("points/getTransactionHistory")
-    Call<TransctionHistoryResponse> getTransactionHistory(@Query("merchantUserRefId") int merchantUserRefId, @Query("outletRefId") int outletRefId);
+    Call<TransctionHistoryResponse> getTransactionHistory(@Query("merchantUserRefId") String merchantUserRefId);
 
     @GET("offers/getOfferClaimingHistory")
-    Call<OfferClaimHistoryResponse> getOfferClaimingHistory(@Query("merchantUserRefId") int merchantUserRefId);
+    Call<OfferClaimHistoryResponse> getOfferClaimingHistory(@Query("merchantUserRefId") String merchantUserRefId);
 
     @POST("offers/releaseOffer")
-    Call<OfferClaimHistoryResponse> releaseOffer(@Query("offerRefId") int offerRefId,
-                                                 @Query("merchantUserRefId") int merchantUserRefId,
-                                                 @Query("unipointCustomerRefId") int unipointCustomerRefId,
-                                                 @Query("pointsAdded") int pointsAdded);
+    Call<OfferClaimHistoryResponse> releaseOffer(@Query("offerRefId") String offerRefId,
+                                                 @Query("merchantUserRefId") String merchantUserRefId,
+                                                 @Query("unipointCustomerRefId") String unipointCustomerRefId,
+                                                 @Query("pointsAdded") String pointsAdded);
 }
